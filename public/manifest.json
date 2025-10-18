@@ -2,8 +2,23 @@
     "manifest_version": 3,
     "name": "study buddy",
     "version": "1.0",
-    "description": "Study Buddy",
+    "description": "Your friendly study companion who keeps you on track",
+    "permissions": ["tabs", "storage"],
     "action": {
-        "default_popup": "index.html"
+        "default_popup": "index.html",
+        "default_icon": {
+            "16": "images/kitty.png",
+            "48": "images/kitty.png",
+            "128": "images/kitty.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": {
+        "16": "images/kitty.png",
+        "48": "images/kitty.png",
+        "128": "images/kitty.png"
     }
+
 }
