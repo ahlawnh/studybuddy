@@ -3,9 +3,8 @@
     "name": "study buddy",
     "version": "1.0",
     "description": "Your friendly study companion who keeps you on track",
-    "permissions": ["tabs", "storage", "sidePanel"],
+    "permissions": ["tabs", "sidePanel"],
     "action": {
-        "default_popup": "index.html",
         "default_icon": {
             "16": "images/kitty.png",
             "48": "images/kitty.png",
@@ -15,7 +14,6 @@
     "side_panel": {
         "default_path": "index.html"
     },
-
     "background": {
         "service_worker": "background.js"
     },
@@ -24,5 +22,4 @@
         "48": "images/kitty.png",
         "128": "images/kitty.png"
     }
-
 }

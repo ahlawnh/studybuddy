@@ -1,69 +1,47 @@
+// src/App.tsx
 import { useState, useEffect } from 'react';
 import './App.css';
 
-// Define the shape of our state object for type safety
 interface BuddyState {
   image: string;
   message: string;
 }
 
-// --- List of Approved Study Websites ---
-// IMPORTANT: This list should match the one in your public/background.js file.
-const studySites = [
-  "wikipedia.org",
-  "khanacademy.org",
-  "coursera.org",
-  "edx.org",
-  "stackoverflow.com",
-  "github.com",
-  "react.dev",
-  "developer.mozilla.org"
-];
-
 function App() {
-  // State to hold the buddy's current image and message
   const [buddyState, setBuddyState] = useState<BuddyState>({
     image: 'images/kitty.png',
-    message: 'Loading...',
+    message: 'Welcome! Navigate to a page.',
   });
 
-  // This `useEffect` hook runs once when the popup is opened.
-  // It's the "workhorse" that checks the current tab's URL.
+  // This useEffect hook sets up a listener for messages from the background script.
   useEffect(() => {
-    // Chrome extension APIs are asynchronous. We use `chrome.tabs.query`
-    // to find the currently active tab in the current window.
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const currentTab = tabs[0];
-
-      // Make sure we have a valid tab and URL
-      if (currentTab && currentTab.url) {
-        try {
-          const url = new URL(currentTab.url);
-          const isStudySite = studySites.some(site => url.hostname.includes(site));
-
-          if (isStudySite) {
-            // If it's a study site, set a happy state
-            setBuddyState({
-              image: 'images/kitty.png',
-              message: 'Great job studying!',
-            });
-          } else {
-            // Otherwise, set a mad state
-            setBuddyState({
-              image: 'images/mad.png',
-              message: 'Hey! Get back to studying!',
-            });
-          }
-        } catch (error) {
-          // Handle invalid URLs like chrome://newtab
+    const messageListener = (message: any) => {
+      // Check if the message is the one we care about
+      if (message.type === 'URL_STATUS') {
+        if (message.isStudySite) {
+          // If it's a study site, set a happy state
           setBuddyState({
             image: 'images/kitty.png',
-            message: 'Ready for a study session?',
+            message: 'Great job studying!',
+          });
+        } else {
+          // Otherwise, set a mad state
+          setBuddyState({
+            image: 'images/mad.png',
+            message: 'Hey! Get back to studying!',
           });
         }
       }
-    });
-  }, []); // The empty array `[]` means this effect runs only once.
+    };
+
+    // Add the listener when the component mounts
+    chrome.runtime.onMessage.addListener(messageListener);
+
+    // Return a cleanup function to remove the listener when the component unmounts
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []); // The empty array [] means this effect runs only once to set up the listener.
 
   return (
     <div className="App">
